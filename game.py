@@ -1,7 +1,19 @@
+from flask import Flask, render_template, request, jsonify, send_from_directory
 import cv2
 import numpy as np
 import tensorflow as tf
+import base64
+import io
+from PIL import Image
 import time
+from flask_cors import CORS
+
+app = Flask(__name__)
+# CORS allows a web app running on one origin to safely request resources from a
+# different origin by letting the server explicitly permit it, preventing security risks
+# from unauthorized cross-site requests.
+CORS(app)
+
 
 # Custom function to handle the groups parameter issue on Mac
 def custom_depthwise_conv2d(*args, **kwargs):
@@ -85,14 +97,59 @@ def check_game_over():
         return True
     return False
 
-# Initialize webcam
-webcam = cv2.VideoCapture(0)
-if not webcam.isOpened():
-    print("Error: Could not open webcam")
-    exit(1)
+def preprocess_image(image_data):
+    # Remove the "data:image/jpeg;base64," prefix if it exists
+    if "," in image_data:
+        image_data = image_data.split(",")[1]
+    
+    # Decode Base64 to bytes
+    image_bytes = base64.b64decode(image_data)
 
-print("Starting RPS Game... Press ESC to quit")
+    # Convert bytes to PIL image
+    image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
 
+    # Convert to OpenCV format (BGR for model)
+    image_np = np.array(image)
+    image_cv = cv2.cvtColor(image_np, cv2.COLOR_RGB2BGR)
+
+    return image_cv  # Return the OpenCV image for further processing
+
+@app.route("/")
+def index():
+    return send_from_directory(".", "index.html")
+
+@app.route("/classify", methods=["POST", "OPTIONS"])
+def classify_image():
+
+    data = request.get_json()
+    image_data = data.get('image')
+
+    if not image_data:
+        return jsonify({'error': 'No image data received'}), 400
+
+    try:
+        frame = preprocess_image(image_data)
+        hand_idx, acc = classify(frame)
+        hand_name = hand_options[hand_idx]
+
+        return jsonify({
+            'hand': hand_name,
+            'accuracy': round(float(acc), 3)
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+if __name__ == "__main__":
+    app.run(debug=True)
+
+
+
+
+
+
+
+
+'''
 while True:
     ret, frame = webcam.read() # returns True/False and one frame
 
@@ -182,6 +239,4 @@ while True:
     if key == 27:  # ESC key
         print("cya")
         break
-
-webcam.release()
-cv2.destroyAllWindows()
+'''

@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rock Paper Scissors AI</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: white;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 30px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .game-container {
+      display: flex;
+      gap: 40px;
+      max-width: 1200px;
+      width: 100%;
+      align-items: flex-start;
+    }
+
+    .video-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #video {
+      width: 320px;
+      height: 240px;
+      border: 3px solid #fff;
+      border-radius: 15px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      background: #000;
+    }
+
+    .controls {
+      margin-top: 20px;
+      display: flex;
+      gap: 15px;
+    }
+
+    button {
+      padding: 12px 24px;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .start-btn {
+      background: linear-gradient(45deg, #4CAF50, #45a049);
+      color: white;
+    }
+
+    .start-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+
+    .stop-btn {
+      background: linear-gradient(45deg, #f44336, #da190b);
+      color: white;
+    }
+
+    .stop-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+
+    .reset-btn {
+      background: linear-gradient(45deg, #ff9800, #f57c00);
+      color: white;
+    }
+
+    .reset-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+
+    .game-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .score-board {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 25px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    }
+
+    .score-title {
+      font-size: 1.5rem;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    .scores {
+      display: flex;
+      justify-content: space-between;
+      font-size: 1.2rem;
+    }
+
+    .player-score, .computer-score {
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-weight: bold;
+    }
+
+    .player-score {
+      background: rgba(76, 175, 80, 0.3);
+      border: 2px solid #4CAF50;
+    }
+
+    .computer-score {
+      background: rgba(244, 67, 54, 0.3);
+      border: 2px solid #f44336;
+    }
+
+    .current-round {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 25px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    }
+
+    .detection-info {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .hand-display {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .accuracy {
+      font-size: 1rem;
+      opacity: 0.8;
+    }
+
+    .game-status {
+      text-align: center;
+      font-size: 1.2rem;
+      font-weight: bold;
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 10px;
+    }
+
+    .waiting {
+      background: rgba(255, 193, 7, 0.3);
+      border: 2px solid #ffc107;
+    }
+
+    .win {
+      background: rgba(76, 175, 80, 0.3);
+      border: 2px solid #4CAF50;
+    }
+
+    .loss {
+      background: rgba(244, 67, 54, 0.3);
+      border: 2px solid #f44336;
+    }
+
+    .tie {
+      background: rgba(33, 150, 243, 0.3);
+      border: 2px solid #2196F3;
+    }
+
+    .countdown {
+      font-size: 1.1rem;
+      text-align: center;
+      margin-top: 10px;
+      color: #ffc107;
+    }
+
+    .game-over {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .game-over-content {
+      background: white;
+      color: #333;
+      padding: 40px;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    .game-over h2 {
+      font-size: 2rem;
+      margin-bottom: 20px;
+    }
+
+    .game-over button {
+      margin-top: 20px;
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      color: white;
+    }
+
+    .hand-icons {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 15px;
+      font-size: 2rem;
+    }
+
+    .vs {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    @media (max-width: 768px) {
+      .game-container {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+      
+      #video {
+        width: 280px;
+        height: 210px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>🎮 Rock Paper Scissors AI</h1>
+  
+  <div class="game-container">
+    <div class="video-section">
+      <video id="video" autoplay playsinline></video>
+      <div class="controls">
+        <button class="start-btn" onclick="startGame()">Start Game</button>
+        <button class="stop-btn" onclick="stopGame()">Stop Game</button>
+        <button class="reset-btn" onclick="resetGame()">Reset</button>
+      </div>
+    </div>
+
+    <div class="game-info">
+      <div class="score-board">
+        <div class="score-title">🏆 Score Board</div>
+        <div class="scores">
+          <div class="player-score">
+            Player: <span id="player-score">0</span>
+          </div>
+          <div class="computer-score">
+            Computer: <span id="computer-score">0</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="current-round">
+        <div class="detection-info">
+          <div class="hand-display" id="detected-hand">Show your hand!</div>
+          <div class="accuracy" id="accuracy">Accuracy: --</div>
+        </div>
+        
+        <div class="hand-icons" id="hand-icons" style="display: none;">
+          <div>You: <span id="player-hand">❓</span></div>
+          <div class="vs">VS</div>
+          <div>AI: <span id="computer-hand">❓</span></div>
+        </div>
+        
+        <div class="game-status waiting" id="game-status">Press Start to begin!</div>
+        <div class="countdown" id="countdown"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="game-over" id="game-over" style="display: none;">
+    <div class="game-over-content">
+      <h2 id="winner-message"></h2>
+      <p>Final Score: <span id="final-score"></span></p>
+      <button onclick="resetGame()">Play Again</button>
+    </div>
+  </div>
+
+  <script>
+    const video = document.getElementById('video');
+    let gameActive = false;
+    let playerScore = 0;
+    let computerScore = 0;
+    let lastRoundTime = 0;
+    let roundCooldown = 3000; // 3 seconds
+    let showResultUntil = 0;
+    let gameInterval;
+    let countdownInterval;
+    
+    const handEmojis = {
+      'Rock': '✊',
+      'Paper': '✋',
+      'Scissors': '✌️'
+    };
+    
+    const handOptions = ['Rock', 'Paper', 'Scissors'];
+
+    // Get access to webcam
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => {
+        video.srcObject = stream;
+      })
+      .catch(err => {
+        console.error("Error accessing webcam: ", err);
+        document.getElementById('game-status').innerText = 'Error: Cannot access webcam';
+      });
+
+    function startGame() {
+      if (!gameActive) {
+        gameActive = true;
+        lastRoundTime = Date.now();
+        document.getElementById('game-status').innerText = 'Game started! Show your hand!';
+        document.getElementById('game-status').className = 'game-status waiting';
+        
+        gameInterval = setInterval(gameLoop, 500); // Check every 500ms
+        startCountdown();
+      }
+    }
+
+    function stopGame() {
+      gameActive = false;
+      clearInterval(gameInterval);
+      clearInterval(countdownInterval);
+      document.getElementById('game-status').innerText = 'Game stopped. Press Start to play!';
+      document.getElementById('game-status').className = 'game-status waiting';
+      document.getElementById('countdown').innerText = '';
+      document.getElementById('hand-icons').style.display = 'none';
+    }
+
+    function resetGame() {
+      stopGame();
+      playerScore = 0;
+      computerScore = 0;
+      document.getElementById('player-score').innerText = playerScore;
+      document.getElementById('computer-score').innerText = computerScore;
+      document.getElementById('detected-hand').innerText = 'Show your hand!';
+      document.getElementById('accuracy').innerText = 'Accuracy: --';
+      document.getElementById('game-over').style.display = 'none';
+      document.getElementById('hand-icons').style.display = 'none';
+    }
+
+    function gameLoop() {
+      if (!gameActive) return;
+      
+      const currentTime = Date.now();
+      
+      // Check if enough time has passed since last round
+      if (currentTime - lastRoundTime >= roundCooldown) {
+        captureAndClassify();
+      }
+      
+      // Hide results after showing them
+      if (currentTime > showResultUntil) {
+        document.getElementById('hand-icons').style.display = 'none';
+      }
+    }
+
+    function startCountdown() {
+      if (!gameActive) return;
+      
+      countdownInterval = setInterval(() => {
+        if (!gameActive) {
+          clearInterval(countdownInterval);
+          return;
+        }
+        
+        const currentTime = Date.now();
+        const timeLeft = Math.max(0, roundCooldown - (currentTime - lastRoundTime));
+        
+        if (timeLeft > 0) {
+          document.getElementById('countdown').innerText = 
+            `Next round in: ${(timeLeft / 1000).toFixed(1)}s`;
+        } else {
+          document.getElementById('countdown').innerText = 'Get ready...';
+        }
+      }, 100);
+    }
+
+    function captureAndClassify() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 224;
+      canvas.height = 224;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, 224, 224);
+      const imageData = canvas.toDataURL('image/jpeg');
+
+      // Try different server URLs
+      const serverUrls = [
+        'http://localhost:5001/classify',
+        'http://127.0.0.1:5001/classify',
+        'http://localhost:5000/classify',
+        'http://127.0.0.1:5000/classify'
+      ];
+
+      tryFetch(serverUrls, 0, imageData);
+    }
+
+    function tryFetch(urls, index, imageData) {
+      if (index >= urls.length) {
+        document.getElementById('game-status').innerText = 'Cannot connect to server. Is Flask running?';
+        document.getElementById('game-status').className = 'game-status waiting';
+        return;
+      }
+
+      fetch(urls[index], {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ image: imageData }),
+        mode: 'cors'
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.error) {
+          document.getElementById('game-status').innerText = `Server error: ${data.error}`;
+          document.getElementById('game-status').className = 'game-status waiting';
+        } else {
+          handleClassificationResult(data);
+        }
+      })
+      .catch(err => {
+        console.log(`Failed to connect to ${urls[index]}: ${err}`);
+        // Try next URL
+        tryFetch(urls, index + 1, imageData);
+      });
+    }
+
+    // Add a function to test server connection
+    function testConnection() {
+      const testUrls = [
+        'http://localhost:5001/health',
+        'http://127.0.0.1:5001/health',
+        'http://localhost:5000/health',
+        'http://127.0.0.1:5000/health'
+      ];
+
+      testUrls.forEach(url => {
+        fetch(url, { mode: 'cors' })
+          .then(response => response.json())
+          .then(data => {
+            console.log(`✅ Server accessible at ${url}:`, data);
+          })
+          .catch(err => {
+            console.log(`❌ Cannot reach ${url}:`, err);
+          });
+      });
+    }
+
+    // Test connection when page loads
+    window.addEventListener('load', () => {
+      setTimeout(testConnection, 1000);
+    });
+
+    function handleClassificationResult(data) {
+      const playerHand = data.hand;
+      const accuracy = data.accuracy;
+      
+      // Update display
+      document.getElementById('detected-hand').innerText = `${handEmojis[playerHand]} ${playerHand}`;
+      document.getElementById('accuracy').innerText = `Accuracy: ${(accuracy * 100).toFixed(1)}%`;
+      
+      // Only play round if accuracy is high enough
+      if (accuracy > 0.7) {
+        playRound(playerHand);
+      } else {
+        document.getElementById('game-status').innerText = 'Show your hand more clearly!';
+        document.getElementById('game-status').className = 'game-status waiting';
+      }
+    }
+
+    function playRound(playerHand) {
+      const computerHand = computerChoice();
+      const result = determineWinner(playerHand, computerHand);
+      
+      // Update hand display
+      document.getElementById('player-hand').innerText = handEmojis[playerHand];
+      document.getElementById('computer-hand').innerText = handEmojis[computerHand];
+      document.getElementById('hand-icons').style.display = 'flex';
+      
+      // Update scores and status
+      if (result === 'Win') {
+        playerScore++;
+        document.getElementById('game-status').innerText = 'You Win! 🎉';
+        document.getElementById('game-status').className = 'game-status win';
+      } else if (result === 'Loss') {
+        computerScore++;
+        document.getElementById('game-status').innerText = 'You Lose! 😔';
+        document.getElementById('game-status').className = 'game-status loss';
+      } else {
+        document.getElementById('game-status').innerText = "It's a Tie! 🤝";
+        document.getElementById('game-status').className = 'game-status tie';
+      }
+      
+      // Update score display
+      document.getElementById('player-score').innerText = playerScore;
+      document.getElementById('computer-score').innerText = computerScore;
+      
+      // Set timers
+      lastRoundTime = Date.now();
+      showResultUntil = lastRoundTime + 2000; // Show result for 2 seconds
+      
+      // Check for game over
+      checkGameOver();
+    }
+
+    function computerChoice() {
+      return handOptions[Math.floor(Math.random() * handOptions.length)];
+    }
+
+    function determineWinner(playerHand, computerHand) {
+      if (playerHand === computerHand) {
+        return 'Tie';
+      } else if (
+        (playerHand === 'Rock' && computerHand === 'Scissors') ||
+        (playerHand === 'Paper' && computerHand === 'Rock') ||
+        (playerHand === 'Scissors' && computerHand === 'Paper')
+      ) {
+        return 'Win';
+      } else {
+        return 'Loss';
+      }
+    }
+
+    function checkGameOver() {
+      if (playerScore >= 3 || computerScore >= 3) {
+        gameActive = false;
+        clearInterval(gameInterval);
+        clearInterval(countdownInterval);
+        
+        const winner = playerScore >= 3 ? 'Player' : 'Computer';
+        const message = playerScore >= 3 ? '🎉 You Won the Game!' : '💻 Computer Won the Game!';
+        
+        document.getElementById('winner-message').innerText = message;
+        document.getElementById('final-score').innerText = `${playerScore} - ${computerScore}`;
+        document.getElementById('game-over').style.display = 'flex';
+        document.getElementById('countdown').innerText = '';
+      }
+    }
+  </script>
+</body>
+</html>
