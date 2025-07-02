@@ -7,7 +7,6 @@ import io
 from PIL import Image
 import time
 from flask_cors import CORS
-import os
 
 app = Flask(__name__)
 # CORS allows a web app running on one origin to safely request resources from a
@@ -139,7 +138,3 @@ def classify_image():
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
