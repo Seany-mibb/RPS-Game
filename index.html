@@ -427,13 +427,8 @@
       ctx.drawImage(video, 0, 0, 224, 224);
       const imageData = canvas.toDataURL('image/jpeg');
 
-      // Try different server URLs
-      const serverUrls = [
-        'http://localhost:5001/classify',
-        'http://127.0.0.1:5001/classify',
-        'http://localhost:5000/classify',
-        'http://127.0.0.1:5000/classify'
-      ];
+      // Use relative URL for deployment
+      const serverUrls = ['/classify'];
 
       tryFetch(serverUrls, 0, imageData);
     }
@@ -472,27 +467,6 @@
         console.log(`Failed to connect to ${urls[index]}: ${err}`);
         // Try next URL
         tryFetch(urls, index + 1, imageData);
-      });
-    }
-
-    // Add a function to test server connection
-    function testConnection() {
-      const testUrls = [
-        'http://localhost:5001/health',
-        'http://127.0.0.1:5001/health',
-        'http://localhost:5000/health',
-        'http://127.0.0.1:5000/health'
-      ];
-
-      testUrls.forEach(url => {
-        fetch(url, { mode: 'cors' })
-          .then(response => response.json())
-          .then(data => {
-            console.log(`✅ Server accessible at ${url}:`, data);
-          })
-          .catch(err => {
-            console.log(`❌ Cannot reach ${url}:`, err);
-          });
       });
     }
 
