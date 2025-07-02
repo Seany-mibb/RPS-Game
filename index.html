@@ -470,11 +470,6 @@
       });
     }
 
-    // Test connection when page loads
-    window.addEventListener('load', () => {
-      setTimeout(testConnection, 1000);
-    });
-
     function handleClassificationResult(data) {
       const playerHand = data.hand;
       const accuracy = data.accuracy;
