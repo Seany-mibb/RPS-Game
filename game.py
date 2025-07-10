@@ -39,12 +39,8 @@ except Exception as e:
     except Exception as e2:
         print(f"Failed to load model: {e2}")
         exit(1)
-
-player_score, comp_score = 0, 0
+        
 hand_options = ["Rock", "Paper", "Scissors"]
-hand, accuracy = "", ""
-game_over = False
-winner_message = ""
 last_round_time = 0
 round_cooldown = 3.0  # 3 seconds between rounds
 show_result_until = 0
