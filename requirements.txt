@@ -1,7 +1,7 @@
 Flask
 flask-cors
 numpy
-opencv-python
+opencv-python-headless
 Pillow
 tensorflow
 gunicorn
